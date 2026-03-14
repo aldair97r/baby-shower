@@ -31,6 +31,9 @@ function App() {
   const [confirmConfig, setConfirmConfig] = useState<{ type: 'delete-question' | 'restart' | 'empty-question', id?: number } | null>(null)
   const [showJsonEditor, setShowJsonEditor] = useState(false)
   const [jsonValue, setJsonValue] = useState('')
+  const [strikes, setStrikes] = useState(0)
+  const [showStrikesAnimation, setShowStrikesAnimation] = useState(false)
+  const [isStrikesDisabled, setIsStrikesDisabled] = useState(false)
 
   const currentQuestion: Question = questions[currentQuestionIndex]
   const totalQuestions = questions.length
@@ -88,6 +91,20 @@ function App() {
   const handleRestartGame = () => {
     setConfirmConfig({ type: 'restart' })
     setShowConfirmModal(true)
+  }
+
+  const handleStrikes = () => {
+    if (isStrikesDisabled) return
+    setStrikes(prev => {
+      const newStrikes = prev >= 3 ? 1 : prev + 1
+      return newStrikes
+    })
+    setShowStrikesAnimation(true)
+    setIsStrikesDisabled(true)
+    setTimeout(() => {
+      setShowStrikesAnimation(false)
+      setIsStrikesDisabled(false)
+    }, 1500)
   }
 
   const getTopAnswers = () => {
@@ -185,6 +202,7 @@ function App() {
       setRevealedAnswers(new Array(6).fill(false))
       setTeam1Score(0)
       setTeam2Score(0)
+      setStrikes(0)
     }
 
     setShowConfirmModal(false)
@@ -296,6 +314,17 @@ function App() {
         ))}
       </div>
 
+      {/* Animación de Taches */}
+      {showStrikesAnimation && (
+        <div className="strikes-overlay">
+          <div className={`strikes-display strikes-${strikes}`}>
+            {strikes >= 1 && <span className="strike">✕</span>}
+            {strikes >= 2 && <span className="strike">✕</span>}
+            {strikes >= 3 && <span className="strike">✕</span>}
+          </div>
+        </div>
+      )}
+
       {/* Controles */}
       <div className="controls">
         <button
@@ -319,6 +348,14 @@ function App() {
           onClick={handleRevealAll}
         >
           Revelar Todas
+        </button>
+
+        <button
+          className="control-btn btn-strikes"
+          onClick={handleStrikes}
+          disabled={isStrikesDisabled}
+        >
+          ❌ Error
         </button>
 
         <button

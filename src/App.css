@@ -439,6 +439,29 @@ body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.modal-header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-json {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #673AB7 0%, #512DA8 100%);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-json:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
 .btn-close {
   background: transparent;
   border: none;
@@ -738,6 +761,33 @@ body {
   color: var(--text-light);
   font-size: 1.2rem;
   margin: 0;
+}
+
+/* Modal Editor JSON */
+.json-modal {
+  max-width: 900px;
+}
+
+.json-body {
+  padding: 20px 30px;
+}
+
+.json-body textarea {
+  width: 100%;
+  height: 50vh;
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+  color: #a5d6a7;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.json-body textarea:focus {
+  outline: none;
+  border-color: var(--secondary);
 }
 
 /* Responsive para modal */

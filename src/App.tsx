@@ -29,6 +29,8 @@ function App() {
   const [configTab, setConfigTab] = useState<'list' | 'edit' | 'add'>('list')
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [confirmConfig, setConfirmConfig] = useState<{ type: 'delete-question' | 'restart' | 'empty-question', id?: number } | null>(null)
+  const [showJsonEditor, setShowJsonEditor] = useState(false)
+  const [jsonValue, setJsonValue] = useState('')
 
   const currentQuestion: Question = questions[currentQuestionIndex]
   const totalQuestions = questions.length
@@ -73,6 +75,12 @@ function App() {
       } else {
         setTeam2Score(team2Score + points)
       }
+    } else if (points < 0) {
+      if (scoreTeam === 1) {
+        setTeam1Score(team1Score + points)
+      } else {
+        setTeam2Score(team2Score + points)
+      }
     }
     setShowScorePanel(false)
   }
@@ -94,6 +102,27 @@ function App() {
     setShowConfigModal(true)
     setConfigTab('list')
     setEditingQuestion(null)
+  }
+
+  const handleOpenJsonEditor = () => {
+    setJsonValue(JSON.stringify(questions, null, 2))
+    setShowJsonEditor(true)
+  }
+
+  const handleSaveJson = () => {
+    try {
+      const parsed = JSON.parse(jsonValue)
+      if (Array.isArray(parsed)) {
+        setQuestions(parsed)
+        setCurrentQuestionIndex(0)
+        setRevealedAnswers(new Array(6).fill(false))
+        setShowJsonEditor(false)
+      } else {
+        alert('El JSON debe ser un array de preguntas')
+      }
+    } catch (e) {
+      alert('JSON inválido: ' + (e as Error).message)
+    }
   }
 
   const handleEditQuestion = (question: Question) => {
@@ -318,7 +347,6 @@ function App() {
                 value={scoreValue}
                 onChange={(e) => setScoreValue(e.target.value)}
                 placeholder="0"
-                min="0"
                 autoFocus
                 onKeyDown={(e) => e.key === 'Enter' && handleAddScore()}
               />
@@ -347,12 +375,21 @@ function App() {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2>⚙️ Configurar Preguntas</h2>
-              <button
-                className="btn-close"
-                onClick={() => setShowConfigModal(false)}
-              >
-                ✕
-              </button>
+              <div className="modal-header-actions">
+                <button
+                  className="btn-json"
+                  onClick={handleOpenJsonEditor}
+                  title="Editar JSON"
+                >
+                  📄 JSON
+                </button>
+                <button
+                  className="btn-close"
+                  onClick={() => setShowConfigModal(false)}
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* Pestañas */}
@@ -505,6 +542,45 @@ function App() {
               <button
                 className="control-btn btn-restart"
                 onClick={() => { setShowConfirmModal(false); setConfirmConfig(null); }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Editor JSON */}
+      {showJsonEditor && (
+        <div className="config-modal" onClick={() => setShowJsonEditor(false)}>
+          <div className="modal-content json-modal" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>📄 Editar JSON</h2>
+              <button
+                className="btn-close"
+                onClick={() => setShowJsonEditor(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="json-body">
+              <textarea
+                value={jsonValue}
+                onChange={(e) => setJsonValue(e.target.value)}
+                placeholder='[{"id": 1, "text": "Pregunta", "answers": [{"text": "Respuesta", "percentage": 50}]}]'
+                spellCheck={false}
+              />
+            </div>
+            <div className="editor-actions">
+              <button
+                className="control-btn btn-score"
+                onClick={handleSaveJson}
+              >
+                💾 Guardar
+              </button>
+              <button
+                className="control-btn btn-restart"
+                onClick={() => setShowJsonEditor(false)}
               >
                 Cancelar
               </button>
